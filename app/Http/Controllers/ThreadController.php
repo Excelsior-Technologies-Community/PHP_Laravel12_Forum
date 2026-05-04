@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Thread;
 use Illuminate\Http\Request;
 
@@ -11,9 +12,20 @@ class ThreadController extends Controller
         $this->middleware('auth')->except(['index', 'show']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $threads = Thread::latest()->with('user')->paginate(10);
+        $query = Thread::query();
+
+        // SEARCH FEATURE
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        $threads = $query->latest()
+            ->with('user')
+            ->paginate(10)
+            ->appends($request->all());
+
         return view('threads.index', compact('threads'));
     }
 
@@ -34,10 +46,9 @@ class ThreadController extends Controller
 
     public function show(Thread $thread)
     {
-        $thread->load('posts.user');
+        $thread->load('posts.user', 'posts.likes');
         return view('threads.show', compact('thread'));
     }
-
     public function edit(Thread $thread)
     {
         if (auth()->id() !== $thread->user_id) {

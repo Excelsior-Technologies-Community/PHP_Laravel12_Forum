@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\LikeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,8 +34,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Posts (replies) for a thread
     Route::post('threads/{thread}/posts', [PostController::class, 'store'])->name('posts.store');
-});
 
+    // ❤️ Like / Unlike post
+    Route::post('/posts/{post}/like', [LikeController::class, 'toggle'])
+        ->name('posts.like');
+});
 // Profile routes (from Breeze / Laravel 12 auth scaffolding)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

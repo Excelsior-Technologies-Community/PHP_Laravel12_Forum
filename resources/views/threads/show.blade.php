@@ -73,23 +73,56 @@
             font-size: 14px;
             margin-bottom: 10px;
         }
+
+        /* ❤️ Like button style */
+        .like-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .like-btn:hover {
+            background: #e60000;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+
         <h1>{{ $thread->title }}</h1>
+
         <a href="{{ route('threads.index') }}" class="back">&larr; Back to Threads</a>
+
         <div class="thread-body">
             <p>{{ $thread->body }}</p>
             <p><strong>By:</strong> {{ $thread->user->name }} | {{ $thread->created_at->format('d M Y H:i') }}</p>
         </div>
 
         <h3>Replies</h3>
+
         @foreach($thread->posts as $post)
             <div class="reply">
+
                 <p>{{ $post->body }}</p>
-                <p><strong>By:</strong> {{ $post->user->name }} | {{ $post->created_at->format('d M Y H:i') }}</p>
+
+                <p>
+                    <strong>By:</strong> {{ $post->user->name }} |
+                    {{ $post->created_at->format('d M Y H:i') }}
+                </p>
+
+                <!-- ❤️ LIKE BUTTON -->
+                <form action="{{ route('posts.like', $post) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="like-btn">
+                        👍 Like ({{ $post->likes->count() }})
+                    </button>
+                </form>
+
             </div>
         @endforeach
 
@@ -108,6 +141,7 @@
             <textarea name="body" rows="4" placeholder="Write a reply..." required></textarea>
             <button type="submit">Post Reply</button>
         </form>
+
     </div>
 </body>
 
