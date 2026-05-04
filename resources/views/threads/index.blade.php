@@ -3,6 +3,7 @@
 
 <head>
     <title>Forum Threads</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -99,38 +100,115 @@
         .create-btn:hover {
             background: #218838;
         }
+
+        /* SEARCH STYLE */
+        .search-box {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            padding: 10px;
+            width: 60%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-box button {
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background: #0056b3;
+        }
+
+        .clear-search {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .clear-search a {
+            color: red;
+            text-decoration: none;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Forum Threads</h1>
-        <a href="{{ route('threads.create') }}" class="create-btn">Create Thread</a>
 
-        @foreach($threads as $thread)
-            <div class="thread">
-                <div class="thread-info">
-                    <a href="{{ route('threads.show', $thread) }}" class="title">{{ $thread->title }}</a>
-                    <p>By {{ $thread->user->name }} | {{ $thread->created_at->format('d M Y H:i') }}</p>
-                </div>
-                <div class="thread-actions">
-                    <a href="{{ route('threads.show', $thread) }}" class="btn btn-show">Show</a>
+<div class="container">
 
-                    @if(auth()->id() === $thread->user_id)
-                        <a href="{{ route('threads.edit', $thread) }}" class="btn btn-edit">Edit</a>
-                        <form action="{{ route('threads.destroy', $thread) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-delete"
-                                onclick="return confirm('Are you sure?')">Delete</button>
-                        </form>
-                    @endif
-                </div>
+    <h1>Forum Threads</h1>
+
+    <!--  SEARCH FORM -->
+    <div class="search-box">
+        <form method="GET" action="{{ route('threads.index') }}">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search threads..."
+                value="{{ request('search') }}"
+            >
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- CLEAR SEARCH -->
+    @if(request('search'))
+        <div class="clear-search">
+            <a href="{{ route('threads.index') }}">Clear Search</a>
+        </div>
+    @endif
+
+    <!-- CREATE THREAD -->
+    <a href="{{ route('threads.create') }}" class="create-btn">Create Thread</a>
+
+    <!-- THREAD LIST -->
+    @foreach($threads as $thread)
+        <div class="thread">
+
+            <div class="thread-info">
+                <a href="{{ route('threads.show', $thread) }}" class="title">
+                    {{ $thread->title }}
+                </a>
+
+                <p>
+                    By {{ $thread->user->name }} |
+                    {{ $thread->created_at->format('d M Y H:i') }}
+                </p>
             </div>
-        @endforeach
 
+            <div class="thread-actions">
+                <a href="{{ route('threads.show', $thread) }}" class="btn btn-show">Show</a>
+
+                @if(auth()->id() === $thread->user_id)
+                    <a href="{{ route('threads.edit', $thread) }}" class="btn btn-edit">Edit</a>
+
+                    <form action="{{ route('threads.destroy', $thread) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-delete"
+                            onclick="return confirm('Are you sure?')">
+                            Delete
+                        </button>
+                    </form>
+                @endif
+            </div>
+
+        </div>
+    @endforeach
+
+    <!-- PAGINATION -->
+    <div style="margin-top:20px;">
         {{ $threads->links() }}
     </div>
-</body>
 
+</div>
+
+</body>
 </html>
