@@ -26,11 +26,26 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function threads() {
-        return $this->hasMany(Thread::class);
-    }
+   public function threads()
+{
+    return $this->hasMany(Thread::class);
+}
 
-    public function posts() {
-        return $this->hasMany(Post::class);
+public function posts()
+{
+    return $this->hasMany(Post::class);
+}
+
+public function likes()
+{
+    return $this->belongsToMany(Post::class, 'likes');
+}
+
+public function getAvatarUrlAttribute()
+{
+    if ($this->avatar) {
+        return asset('storage/avatars/' . $this->avatar);
     }
+    return 'https://ui-avatars.com/api/?background=0D8F81&color=fff&name=' . urlencode($this->name);
+}
 }

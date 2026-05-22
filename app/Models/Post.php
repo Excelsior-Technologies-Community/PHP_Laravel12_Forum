@@ -1,27 +1,28 @@
 <?php
+// app/Models/Post.php (add methods)
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    use HasFactory;
-    protected $fillable = ['body', 'thread_id', 'user_id'];
+    protected $fillable = ['body', 'user_id', 'thread_id'];
 
-    public function thread()
+    // Existing relationships plus:
+
+    public function isBest()
     {
-        return $this->belongsTo(Thread::class);
+        return $this->thread->best_post_id === $this->id;
     }
 
-    public function user()
+    public function canBeDeleted()
     {
-        return $this->belongsTo(User::class);
+        return auth()->id() === $this->user_id || auth()->id() === $this->thread->user_id;
     }
 
-    public function likes()
+    public function canBeEdited()
     {
-        return $this->hasMany(Like::class);
+        return auth()->id() === $this->user_id;
     }
 }
