@@ -1,96 +1,38 @@
+{{-- resources/views/posts/edit.blade.php --}}
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Edit Thread</title>
+    <title>Edit Reply</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            width: 50%;
-            margin: 50px auto;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px #ccc;
-            border-radius: 8px;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        input,
-        textarea {
-            margin-bottom: 15px;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            padding: 10px;
-            font-size: 16px;
-            background: #ffc107;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #e0a800;
-        }
-
-        .back {
-            display: inline-block;
-            margin-bottom: 20px;
-            text-decoration: none;
-            color: #007bff;
-        }
-
-        .error {
-            color: red;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 800px; margin: 40px auto; background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h1 { margin-bottom: 24px; font-size: 24px; color: #1a1a1a; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #1a73e8; text-decoration: none; }
+        textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; margin-bottom: 16px; }
+        button { background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #1557b0; }
+        .error { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 16px; }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <h1>Edit Thread</h1>
-        <a href="{{ route('threads.index') }}" class="back">&larr; Back to Threads</a>
-
-        @if ($errors->any())
-            <div class="error">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form action="{{ route('threads.update', $thread) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <input type="text" name="title" value="{{ old('title', $thread->title) }}" required>
-            <textarea name="body" rows="6" required>{{ old('body', $thread->body) }}</textarea>
-            <button type="submit">Update Thread</button>
-        </form>
-    </div>
+<div class="container">
+    <a href="{{ route('threads.show', $post->thread) }}" class="back-link">← Back to Thread</a>
+    <h1>Edit Reply</h1>
+    
+    @if ($errors->any())
+        <div class="error">
+            @foreach ($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+        </div>
+    @endif
+    
+    <form action="{{ route('posts.update', $post) }}" method="POST">
+        @csrf @method('PUT')
+        <textarea name="body" rows="6" required>{{ old('body', $post->body) }}</textarea>
+        <button type="submit">Update Reply</button>
+    </form>
+</div>
 </body>
-
 </html>

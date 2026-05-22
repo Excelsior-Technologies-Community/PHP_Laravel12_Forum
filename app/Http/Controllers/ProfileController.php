@@ -9,8 +9,25 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+use App\Models\User;
+
 class ProfileController extends Controller
 {
+    public function show(User $user)
+    {
+        $threads = $user->threads()->latest()->paginate(5);
+        $posts = $user->posts()->latest()->paginate(5);
+
+        return view('profile.show', compact('user', 'threads', 'posts'));
+    }
+
+    public function activity(User $user)
+    {
+        $threads = $user->threads()->latest()->paginate(10);
+        $posts = $user->posts()->latest()->paginate(10);
+
+        return view('profile.activity', compact('user', 'threads', 'posts'));
+    }
     /**
      * Display the user's profile form.
      */
