@@ -1,10 +1,10 @@
 <?php
-// app/Http/Controllers/PostController.php (updated)
 
 namespace App\Http\Controllers;
 
 use App\Models\Thread;
 use App\Models\Post;
+use App\Models\Like;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -13,12 +13,11 @@ class PostController extends Controller
     {
         $request->validate(['body' => 'required|string|min:2']);
 
-        $post = $thread->posts()->create([
+        $thread->posts()->create([
             'body' => $request->body,
             'user_id' => auth()->id()
         ]);
 
-        // Give reputation for posting reply
         auth()->user()->increment('reputation', 2);
 
         return redirect()->route('threads.show', $thread)->with('success', 'Reply posted!');
@@ -50,18 +49,42 @@ class PostController extends Controller
     {
         $thread = $post->thread;
 
-        // Allow if user owns post OR user owns thread
         if (auth()->id() !== $post->user_id && auth()->id() !== $thread->user_id) {
             abort(403);
         }
 
-        $post->delete();
-
-        // If this was the best reply, remove it
         if ($thread->best_post_id === $post->id) {
             $thread->update(['best_post_id' => null]);
         }
 
+        $post->delete();
+
         return redirect()->route('threads.show', $thread)->with('success', 'Reply deleted!');
+    }
+
+    public function best(Post $post)
+    {
+        $thread = $post->thread;
+
+        if (auth()->id() !== $thread->user_id) {
+            abort(403);
+        }
+
+        $thread->markBestReply($post);
+
+        return back()->with('success', 'Best reply marked!');
+    }
+
+    public function toggleLike(Post $post)
+    {
+        $like = $post->likes()->where('user_id', auth()->id())->first();
+
+        if ($like) {
+            $like->delete();
+        } else {
+            $post->likes()->create(['user_id' => auth()->id()]);
+        }
+
+        return back();
     }
 }

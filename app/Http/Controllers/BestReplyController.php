@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/BestReplyController.php
 
 namespace App\Http\Controllers;
 
@@ -12,7 +11,6 @@ class BestReplyController extends Controller
     {
         $thread = $post->thread;
 
-        // Only thread owner can mark best reply
         if (auth()->id() !== $thread->user_id) {
             abort(403);
         }

@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/ThreadController.php (updated)
 
 namespace App\Http\Controllers;
 
@@ -19,25 +18,22 @@ class ThreadController extends Controller
     {
         $query = Thread::with(['user', 'category']);
 
-        // SEARCH
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        // CATEGORY FILTER
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
 
-        // SORTING
         $sort = $request->get('sort', 'latest');
         switch ($sort) {
             case 'popular':
                 $query->withCount('posts')->orderBy('posts_count', 'desc');
                 break;
             case 'most_liked':
-                $query->withCount(['posts' => function($q) {
-                    $q->withCount('likes');
+                $query->withCount(['posts as posts_likes_count' => function($q) {
+                    $q->withSum('likes', 'id');
                 }])->orderBy('posts_likes_count', 'desc');
                 break;
             case 'oldest':
@@ -63,8 +59,8 @@ class ThreadController extends Controller
                 $query->withCount('posts')->orderBy('posts_count', 'desc');
                 break;
             case 'most_liked':
-                $query->withCount(['posts' => function($q) {
-                    $q->withCount('likes');
+                $query->withCount(['posts as posts_likes_count' => function($q) {
+                    $q->withSum('likes', 'id');
                 }])->orderBy('posts_likes_count', 'desc');
                 break;
             default:
@@ -93,7 +89,6 @@ class ThreadController extends Controller
 
         auth()->user()->threads()->create($request->all());
 
-        // Give reputation for creating thread
         auth()->user()->increment('reputation', 5);
 
         return redirect()->route('threads.index')->with('success', 'Thread created!');
@@ -101,7 +96,7 @@ class ThreadController extends Controller
 
     public function show(Thread $thread)
     {
-        $thread->load('posts.user.likes', 'posts.likes', 'category', 'bestPost');
+        $thread->load(['user', 'posts.user', 'category', 'bestPost']);
         return view('threads.show', compact('thread'));
     }
 
