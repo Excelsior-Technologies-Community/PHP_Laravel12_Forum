@@ -1,5 +1,4 @@
 <?php
-// app/Models/Thread.php (add these relationships)
 
 namespace App\Models;
 
@@ -9,11 +8,19 @@ class Thread extends Model
 {
     protected $fillable = ['title', 'body', 'user_id', 'category_id', 'best_post_id'];
 
-    // Existing relationships plus these:
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
     }
 
     public function bestPost()
@@ -26,7 +33,6 @@ class Thread extends Model
         $this->best_post_id = $post->id;
         $this->save();
 
-        // Give reputation to the user who wrote the best reply
         $post->user->increment('reputation', 10);
     }
 
